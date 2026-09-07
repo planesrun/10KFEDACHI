@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10K FEDACHI - 15.11</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#14212C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="10K FEDACHI">
+<link rel="icon" href="./icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14212C;
+    --ink-2:#3A4A58;
+    --paper:#E9EAE4;
+    --card:#FCFCFA;
+    --line:#CBCDC5;
+    --line-2:#DEDFD8;
+    --track:#B23A2E;
+    --water:#2F6E88;
+    --dim:#7E847C;
+    --ok:#3E7A56;
+    --r:3px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Barlow",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:15px;
+    line-height:1.45;
+    font-variant-numeric:tabular-nums;
+    padding-bottom:80px;
+  }
+  .cond{font-family:"Barlow Condensed","Arial Narrow",Impact,sans-serif;}
+  .wrap{max-width:760px;margin:0 auto;padding:0 14px;}
+
+  /* ---------- Encabezado / hoy ---------- */
+  header{padding:20px 0 6px;}
+  .kicker{font-size:13px;color:var(--dim);letter-spacing:.02em;margin:0 0 2px;}
+  h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:700;font-size:31px;line-height:1;margin:0 0 3px;letter-spacing:-.01em;}
+  .countdown{font-size:13px;color:var(--ink-2);margin:0 0 16px;}
+  .countdown b{font-weight:600;}
+
+  .hoy{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--water);border-radius:var(--r);padding:14px 15px;margin-bottom:16px;}
+  .hoy.esCalidad{border-left-color:var(--track);}
+  .hoy.esCarrera{background:var(--ink);color:#F4F5F1;border-color:var(--ink);border-left-color:var(--track);}
+  .hoy.esCarrera .hoy-meta{color:#A9B4BC;}
+  .hoy-meta{font-size:12.5px;color:var(--dim);margin:0 0 4px;}
+  .hoy-tit{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:25px;line-height:1.08;margin:0 0 5px;}
+  .hoy-det{font-size:14px;color:var(--ink-2);margin:0 0 12px;}
+  .hoy.esCarrera .hoy-det{color:#D3DAE0;}
+  .btn{
+    font-family:inherit;font-size:14.5px;font-weight:600;
+    background:transparent;color:var(--ink);
+    border:1.5px solid var(--ink);border-radius:var(--r);
+    padding:9px 16px;cursor:pointer;width:100%;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn.done{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .hoy.esCarrera .btn{border-color:#F4F5F1;color:#F4F5F1;}
+  .hoy.esCarrera .btn.done{background:var(--ok);border-color:var(--ok);}
+  .btn:focus-visible,.dia:focus-visible,.tab:focus-visible,.wk-head:focus-visible{outline:2.5px solid var(--water);outline-offset:2px;}
+
+  /* ---------- Perfil de volumen ---------- */
+  .perfil{margin-bottom:20px;}
+  .perfil-lab{font-size:12.5px;color:var(--dim);margin:0 0 7px;display:flex;justify-content:space-between;}
+  .bars{display:flex;align-items:flex-end;gap:3px;height:74px;}
+  .bar{flex:1;position:relative;display:flex;flex-direction:column;justify-content:flex-end;height:100%;cursor:pointer;background:none;border:0;padding:0;}
+  .bar .fill{width:100%;background:var(--line);border-radius:1.5px 1.5px 0 0;transition:background .15s;}
+  .bar .prog{position:absolute;left:0;bottom:0;width:100%;background:var(--water);border-radius:1.5px 1.5px 0 0;}
+  .bar[data-b="descarga"] .fill{background:#D6D8D0;}
+  .bar[data-b="pico"] .fill{background:#C9B0AC;}
+  .bar[data-b="pico"] .prog{background:var(--track);}
+  .bar[data-b="carrera"] .fill{background:#9AA3A9;}
+  .bar[data-b="carrera"] .prog{background:var(--ink);}
+  .bar.actual::after{content:"";position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:var(--ink);}
+  .bar-n{font-family:"Barlow Condensed",sans-serif;font-size:11.5px;color:var(--dim);text-align:center;margin-top:9px;}
+
+  /* ---------- Semanas ---------- */
+  .wk{border:1px solid var(--line);border-radius:var(--r);background:var(--card);margin-bottom:9px;overflow:hidden;}
+  .wk.on{border-color:var(--ink-2);}
+  .wk-head{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;background:none;border:0;width:100%;text-align:left;font-family:inherit;}
+  .wk-num{font-family:"Barlow Condensed",sans-serif;font-size:22px;font-weight:700;line-height:1;min-width:22px;color:var(--ink);}
+  .wk-info{flex:1;min-width:0;}
+  .wk-t{font-size:14.5px;font-weight:600;line-height:1.2;}
+  .wk-s{font-size:12.5px;color:var(--dim);}
+  .wk-prog{font-family:"Barlow Condensed",sans-serif;font-size:15px;color:var(--dim);white-space:nowrap;}
+  .wk-prog.full{color:var(--ok);font-weight:600;}
+  .chev{color:var(--dim);font-size:12px;transition:transform .18s;}
+  .wk.on .chev{transform:rotate(180deg);}
+  .wk-body{display:none;border-top:1px solid var(--line-2);}
+  .wk.on .wk-body{display:block;}
+
+  .dia{display:flex;gap:11px;padding:10px 13px;border-bottom:1px solid var(--line-2);cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left;font-family:inherit;align-items:flex-start;}
+  .dia:last-child{border-bottom:0;}
+  .dia.rest{cursor:default;background:#F1F2EC;}
+  .dia.hoyRow{background:#F0F4F5;}
+  .mark{width:19px;height:19px;border:1.5px solid var(--ink-2);border-radius:2px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;line-height:1;}
+  .dia.hecho .mark{background:var(--ok);border-color:var(--ok);}
+  .dia.rest .mark{border:0;background:none;}
+  .d-fecha{font-family:"Barlow Condensed",sans-serif;font-size:14.5px;font-weight:600;min-width:46px;color:var(--ink-2);flex-shrink:0;padding-top:2px;}
+  .d-body{flex:1;min-width:0;}
+  .d-t{font-size:14.5px;font-weight:600;line-height:1.25;}
+  .d-d{font-size:13px;color:var(--ink-2);line-height:1.35;margin-top:1px;}
+  .dia.hecho .d-t,.dia.hecho .d-d{color:var(--dim);}
+  .dia.hecho .d-t{text-decoration:line-through;text-decoration-thickness:1px;}
+  .dia.rest .d-t{color:var(--dim);font-weight:500;}
+  .pill{display:inline-block;font-family:"Barlow Condensed",sans-serif;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:2px;margin-left:6px;vertical-align:1px;}
+  .p-cal{background:#F0DCD9;color:var(--track);}
+  .p-fue{background:#DDE7EB;color:var(--water);}
+  .p-car{background:var(--ink);color:#fff;}
+  .nota{font-size:12.5px;color:var(--ink-2);background:#F1F2EC;border-left:3px solid var(--line);padding:9px 12px;margin:0;}
+
+  /* ---------- Referencia ---------- */
+  .tabs{display:flex;gap:0;border-bottom:1.5px solid var(--line);margin:26px 0 0;overflow-x:auto;}
+  .tab{font-family:"Barlow Condensed",sans-serif;font-size:16px;font-weight:600;background:none;border:0;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;padding:8px 13px 7px;color:var(--dim);cursor:pointer;white-space:nowrap;}
+  .tab.on{color:var(--ink);border-bottom-color:var(--track);}
+  .panel{display:none;padding:15px 0 0;}
+  .panel.on{display:block;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin-bottom:14px;}
+  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line-2);vertical-align:top;}
+  th{font-family:"Barlow Condensed",sans-serif;font-size:13.5px;color:var(--dim);font-weight:600;border-bottom:1.5px solid var(--line);}
+  td.n{font-weight:600;white-space:nowrap;}
+  h3{font-family:"Barlow Condensed",sans-serif;font-size:19px;font-weight:600;margin:20px 0 6px;}
+  h3:first-child{margin-top:0;}
+  .sub{font-size:13px;color:var(--dim);margin:-3px 0 9px;}
+  footer{margin-top:30px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--dim);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+  .acciones{display:flex;gap:7px;flex-wrap:wrap;}
+  .instalar{border-color:var(--ink);color:var(--ink);font-weight:600;}
+  .reset{font-family:inherit;font-size:12.5px;color:var(--dim);background:none;border:1px solid var(--line);border-radius:var(--r);padding:5px 10px;cursor:pointer;}
+  .estado{font-size:12.5px;color:var(--dim);padding:6px 0;}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="kicker" id="kicker">Cargando</p>
+  <h1>10K FEDACHI - 15.11</h1>
+  <p class="countdown" id="countdown"></p>
+</header>
+
+<div id="hoyBox"></div>
+
+<div class="perfil">
+  <p class="perfil-lab"><span>Volumen semanal</span><span id="totalProg"></span></p>
+  <div class="bars" id="bars"></div>
+  <div style="display:flex;gap:3px;" id="barNums"></div>
+</div>
+
+<div id="semanas"></div>
+<p class="estado" id="estado"></p>
+
+<div class="tabs">
+  <button class="tab on" data-p="ritmos">Ritmos</button>
+  <button class="tab" data-p="fuerza">Fuerza</button>
+  <button class="tab" data-p="protocolos">Protocolos</button>
+  <button class="tab" data-p="carrera">Día de carrera</button>
+</div>
+
+<div class="panel on" id="p-ritmos">
+  <h3>Ritmos y zonas de trabajo</h3>
+  <p class="sub">Rodajes por frecuencia cardíaca, series por ritmo.</p>
+  <table>
+    <tr><th>Sigla</th><th>Trabajo</th><th>Referencia</th></tr>
+    <tr><td class="n">RS</td><td>Rodaje suave</td><td>FC 142 a 160, Z2 completa. Apuntar a 145 a 155; el techo es límite, no objetivo</td></tr>
+    <tr><td class="n">RM</td><td>Rodaje moderado</td><td>FC 161 a 169, Z3 exacta. El piso es 161, si no es un rodaje suave con otro nombre</td></tr>
+    <tr><td class="n">RL</td><td>Rodaje largo</td><td>FC 142 a 160. Se tolera deriva hasta 163 en el último tercio de largos sobre 10 km, sin bajar el ritmo para corregirla</td></tr>
+    <tr><td class="n">RC</td><td>Ritmo de carrera</td><td>4'25" a 4'28"/km</td></tr>
+    <tr><td class="n">RU</td><td>Ritmo umbral</td><td>4'18" a 4'22"/km</td></tr>
+    <tr><td class="n">ST</td><td>Strides</td><td>100 m progresivos, nunca máximos, recuperación caminando</td></tr>
+  </table>
+  <h3>Las zonas de ritmo del reloj están desactualizadas</h3>
+  <p class="sub" style="margin-bottom:14px;">Están calculadas sobre el test de julio, 4'26"/km, que fue subestimado por fatiga acumulada de once semanas. La zona Umbral del reloj, 4'33" a 5'00", es demasiado lenta, y el ritmo real de umbral aparece clasificado como Resistencia Anaeróbica. Las zonas de frecuencia cardíaca sí son válidas, porque a 4'20"/km la FC se ubica entre 178 y 182. En series manda el ritmo de esta tabla, no el color de la pantalla.</p>
+  <h3>Estructura obligatoria de toda sesión de calidad</h3>
+  <table>
+    <tr><td class="n">1</td><td>Movilidad, 5 a 8 min, cadera, tobillo y columna torácica</td></tr>
+    <tr><td class="n">2</td><td>Calentamiento progresivo, 2 a 2,5 km, de RS a RM</td></tr>
+    <tr><td class="n">3</td><td>Strides, 4 x 100 m progresivos</td></tr>
+    <tr><td class="n">4</td><td>Serie principal. Descansos siempre estáticos, de pie</td></tr>
+    <tr><td class="n">5</td><td>Enfriamiento, 1,5 a 2 km muy suave, FC bajo 150</td></tr>
+    <tr><td class="n">6</td><td>Estiramientos, 8 a 10 min, foco en isquiotibiales y banda iliotibial</td></tr>
+  </table>
+  <h3>Zapatillas</h3>
+  <table>
+    <tr><td class="n">Rodajes y activaciones</td><td>Asics Novablast 5</td></tr>
+    <tr><td class="n">Calidad, control 5K y competencia</td><td>Adidas Adizero EVO SL EXO</td></tr>
+    <tr><td class="n">Largos del domingo</td><td>Nike Vomero Plus</td></tr>
+  </table>
+</div>
+
+<div class="panel" id="p-fuerza">
+  <p class="sub">Foam roller obligatorio antes de cada sesión: banda iliotibial, cuádriceps y glúteos, 2 minutos por zona. Ninguna rutina incluye sentadillas búlgaras, sentadillas profundas ni flexión profunda de rodilla bajo carga.</p>
+  <h3>Rutina A, preventivo</h3>
+  <p class="sub">Semanas 1, 2, 3 y 9</p>
+  <table>
+    <tr><th>Ejercicio</th><th>Peso</th><th>Series</th></tr>
+    <tr><td>Puente de glúteo unipodal</td><td>Sin carga</td><td class="n">3 x 12 lado</td></tr>
+    <tr><td>Clamshell con banda</td><td>Banda alta</td><td class="n">3 x 15 lado</td></tr>
+    <tr><td>Patada atrás con banda</td><td>Banda alta</td><td class="n">3 x 15 lado</td></tr>
+    <tr><td>Elevación de talones excéntrica</td><td>Sin carga, opcional 2 x 6 kg</td><td class="n">3 x 15</td></tr>
+    <tr><td>Plancha frontal</td><td>Peso corporal</td><td class="n">3 x 30-40 s</td></tr>
+    <tr><td>Dead bug</td><td>Peso corporal</td><td class="n">3 x 10 lado</td></tr>
+    <tr><td>Skipping suave</td><td>Peso corporal</td><td class="n">3 x 20 s</td></tr>
+  </table>
+  <p class="sub">Versión reducida, semanas 3 y 9: 2 series en todo y se elimina el skipping.</p>
+
+  <h3>Rutina B, funcional</h3>
+  <p class="sub">Semanas 4, 5 y 6</p>
+  <table>
+    <tr><th>Ejercicio</th><th>Peso</th><th>Series</th></tr>
+    <tr><td>Hip thrust con kettlebell</td><td>Kettlebell 10 kg</td><td class="n">3 x 12</td></tr>
+    <tr><td>Peso muerto unipodal</td><td>Mancuerna 6 kg, mano contraria</td><td class="n">3 x 10 lado</td></tr>
+    <tr><td>Monster walk con banda</td><td>Banda alta</td><td class="n">3 x 15 pasos</td></tr>
+    <tr><td>Side-lying hip raise</td><td>Sin carga</td><td class="n">3 x 12 lado</td></tr>
+    <tr><td>Plancha lateral</td><td>Peso corporal</td><td class="n">3 x 30 s lado</td></tr>
+    <tr><td>Russian twist</td><td>Sin carga o kettlebell 10 kg</td><td class="n">3 x 16</td></tr>
+    <tr><td>Saltos laterales suaves</td><td>Peso corporal</td><td class="n">3 x 8 lado</td></tr>
+    <tr><td>High knees</td><td>Peso corporal</td><td class="n">3 x 20 s</td></tr>
+  </table>
+  <p class="sub">Versión reducida, semana 6: 2 series y se eliminan saltos laterales y high knees.</p>
+
+  <h3>Rutina C, potencia</h3>
+  <p class="sub">Semanas 7 y 8</p>
+  <table>
+    <tr><th>Ejercicio</th><th>Peso</th><th>Series</th></tr>
+    <tr><td>Hip thrust pesado</td><td>Kettlebell 10 kg más ambas mancuernas de 6 kg sobre la cadera, o solo kettlebell si la técnica se resiente</td><td class="n">4 x 10</td></tr>
+    <tr><td>Peso muerto con kettlebell</td><td>Kettlebell 10 kg</td><td class="n">4 x 10</td></tr>
+    <tr><td>Abducción de cadera de pie</td><td>Banda alta</td><td class="n">3 x 15 lado</td></tr>
+    <tr><td>Lateral bound</td><td>Peso corporal</td><td class="n">4 x 8 lado</td></tr>
+    <tr><td>Hollow body hold</td><td>Peso corporal</td><td class="n">3 x 20-30 s</td></tr>
+    <tr><td>Pallof press</td><td>Banda alta</td><td class="n">3 x 10 lado</td></tr>
+    <tr><td>Salto vertical, aterrizaje suave</td><td>Peso corporal</td><td class="n">3 x 6</td></tr>
+    <tr><td>High knees más butt kicks</td><td>Peso corporal</td><td class="n">4 x 30 s</td></tr>
+  </table>
+  <p class="sub">El lateral bound sustituye al step-up explosivo con cajón; high knees más butt kicks sustituye al bounding. Ambas absorben el impacto en cadera, no en rodilla.</p>
+</div>
+
+<div class="panel" id="p-protocolos">
+  <h3>Protocolos permanentes</h3>
+  <table>
+    <tr><td class="n" style="width:36%">Molestia en rodilla, cadera o banda iliotibial</td><td>Se suspende la sesión, sea de carrera o de fuerza, y se reemplaza por 30 minutos de bicicleta suave más foam roller. No se termina la serie</td></tr>
+    <tr><td class="n">Lluvia prolongada</td><td>Se conserva la sesión de calidad de la semana. El largo y el moderado son postergables. La bicicleta no sirve en lluvia, la pista sí</td></tr>
+    <tr><td class="n">Día caluroso</td><td>La FC se eleva de forma artificial. En rodajes, aceptar 3 a 5 ppm sobre el rango; en series, mandar por ritmo y sensación</td></tr>
+    <tr><td class="n">Día frío o piernas frescas</td><td>La FC queda artificialmente baja. No forzar el ritmo para alcanzar el rango</td></tr>
+    <tr><td class="n">Fatiga acumulada evidente</td><td>Reducir series es preferible a forzar el volumen completo. Nunca reducir el ritmo, siempre las repeticiones</td></tr>
+  </table>
+  <h3>Punto de control de las semanas 7 y 8</h3>
+  <p class="sub">Volumen máximo e intensidad máxima coinciden. Si aparece bursitis, molestia de banda iliotibial o aprietes en la rodilla operada, el volumen semanal se recorta a 33 o 34 km sin discusión. La semana 8 se ejecuta una sola vez y no se repite.</p>
+  <h3>Cómo leer el control de 5K del 17 de octubre</h3>
+  <table>
+    <tr><td class="n">Bajo 21:30</td><td>Abre el escenario de 44:00 a 44:20</td></tr>
+    <tr><td class="n">21:30 a 22:00</td><td>Se mantiene el plan tal como está</td></tr>
+    <tr><td class="n">Sobre 22:00</td><td>Se baja el ritmo de las series del bloque Pico, no se insiste en el original</td></tr>
+  </table>
+</div>
+
+<div class="panel" id="p-carrera">
+  <h3>Estrategia, domingo 15 de noviembre</h3>
+  <p class="sub">Objetivo, 44:20 a 44:45. Calentamiento previo: 1,5 km suaves, movilidad y 4 strides, terminando 10 a 12 minutos antes de la partida.</p>
+  <table>
+    <tr><th>Tramo</th><th>Ritmo</th><th>Instrucción</th></tr>
+    <tr><td class="n">Km 1 y 2</td><td class="n">4'30"-4'32"</td><td>Contención deliberada. Salir a 4'15" con la adrenalina de la partida se paga desde el km 6. Los ocho segundos que cuesta ir contenido se recuperan íntegros después</td></tr>
+    <tr><td class="n">Km 3 a 7</td><td class="n">4'26"-4'28"</td><td>Ritmo de crucero. Manda el ritmo, no la frecuencia cardíaca: en noviembre en Santiago el calor la eleva de forma artificial</td></tr>
+    <tr><td class="n">Km 8 a 10</td><td class="n">4'20" o lo que permita</td><td>Progresión final. Tanto en el progresivo del 18 de julio como en la simulación del 9 de agosto el cierre fue el tramo más rápido; es tu patrón natural</td></tr>
+  </table>
+</div>
+
+<footer>
+  <span>Ciclo del 7 de septiembre al 15 de noviembre de 2026</span>
+  <span class="acciones">
+    <button class="reset instalar" id="instalar" hidden>Instalar en el teléfono</button>
+    <button class="reset" id="exportar">Guardar copia</button>
+    <button class="reset" id="restaurar">Restaurar</button>
+    <button class="reset" id="reset">Borrar marcas</button>
+  </span>
+</footer>
+<input type="file" id="archivoCopia" accept="application/json,.json" hidden>
+
+</div>
+
+<script>
+const PLAN = [
+ {n:1,f:"7 al 13 de septiembre",b:"Base",bk:"base",km:24,d:[
+  {i:"s1a",f:"Lun 7",fe:"2026-09-07",t:"descanso",ti:"Descanso absoluto"},
+  {i:"s1b",f:"Mar 8",fe:"2026-09-08",t:"rodaje",ti:"Rodaje suave más 4 strides",de:"5,5 km, FC 142 a 160",km:5.5},
+  {i:"s1c",f:"Mié 9",fe:"2026-09-09",t:"fuerza",ti:"Fuerza, Rutina A",de:"3 series. Sin trote adicional"},
+  {i:"s1d",f:"Jue 10",fe:"2026-09-10",t:"calidad",ti:"6 x 400 m a ritmo umbral",de:"4'18\" a 4'22\"/km, 90 s de descanso estático de pie. Total 6,5 km con las seis fases",km:6.5},
+  {i:"s1e",f:"Vie 11",fe:"2026-09-11",t:"fuerza",ti:"Fuerza, Rutina A",de:"3 series. Sin trote adicional"},
+  {i:"s1f",f:"Sáb 12",fe:"2026-09-12",t:"rodaje",ti:"Rodaje suave",de:"4 km, FC 142 a 160",km:4},
+  {i:"s1g",f:"Dom 13",fe:"2026-09-13",t:"largo",ti:"Rodaje largo",de:"8 km, FC 142 a 160. Primer largo con las Vomero Plus: atención a rodilla y banda iliotibial en el último tercio",km:8}]},
+
+ {n:2,f:"14 al 20 de septiembre",b:"Base",bk:"base",km:26.5,
+  nota:"Fiestas Patrias. Si hay que sacrificar algo, se conserva la calidad del jueves 17 y el largo del domingo 20. La fuerza del viernes puede moverse al sábado y el rodaje del sábado puede eliminarse. Lo que no corresponde es recuperar ese volumen en la semana 3, que es de descarga.",d:[
+  {i:"s2a",f:"Lun 14",fe:"2026-09-14",t:"descanso",ti:"Descanso absoluto"},
+  {i:"s2b",f:"Mar 15",fe:"2026-09-15",t:"rodaje",ti:"Rodaje suave más 4 strides",de:"6 km, FC 142 a 160",km:6},
+  {i:"s2c",f:"Mié 16",fe:"2026-09-16",t:"fuerza",ti:"Fuerza, Rutina A",de:"3 series"},
+  {i:"s2d",f:"Jue 17",fe:"2026-09-17",t:"calidad",ti:"8 x 400 m a ritmo umbral",de:"4'18\" a 4'22\"/km, 90 s estáticos. Sube el volumen de serie, no el ritmo. Total 7 km",km:7},
+  {i:"s2e",f:"Vie 18",fe:"2026-09-18",t:"fuerza",ti:"Fuerza, Rutina A",de:"3 series"},
+  {i:"s2f",f:"Sáb 19",fe:"2026-09-19",t:"rodaje",ti:"Rodaje suave",de:"5 km, FC 142 a 160",km:5},
+  {i:"s2g",f:"Dom 20",fe:"2026-09-20",t:"largo",ti:"Rodaje largo",de:"8,5 km, FC 142 a 160. Segundo largo con Vomero Plus. Si sale limpio, quedan confirmadas para el resto del ciclo",km:8.5}]},
+
+ {n:3,f:"21 al 27 de septiembre",b:"Descarga",bk:"descarga",km:19,
+  nota:"Se reduce volumen y repeticiones, el ritmo de las series se mantiene intacto.",d:[
+  {i:"s3a",f:"Lun 21",fe:"2026-09-21",t:"descanso",ti:"Descanso absoluto"},
+  {i:"s3b",f:"Mar 22",fe:"2026-09-22",t:"rodaje",ti:"Rodaje suave más 4 strides",de:"5 km, FC 142 a 160",km:5},
+  {i:"s3c",f:"Mié 23",fe:"2026-09-23",t:"fuerza",ti:"Fuerza, Rutina A reducida",de:"2 series, sin skipping. Única sesión de fuerza de la semana"},
+  {i:"s3d",f:"Jue 24",fe:"2026-09-24",t:"calidad",ti:"5 x 400 m a ritmo umbral",de:"Mismo ritmo que la semana 2, tres repeticiones menos. Total 6 km",km:6},
+  {i:"s3e",f:"Vie 25",fe:"2026-09-25",t:"descanso",ti:"Sin sesión de fuerza"},
+  {i:"s3f",f:"Sáb 26",fe:"2026-09-26",t:"bici",ti:"Bicicleta 40 min Z2, opcional",de:"Estímulo aeróbico sin impacto articular"},
+  {i:"s3g",f:"Dom 27",fe:"2026-09-27",t:"largo",ti:"Rodaje largo",de:"8 km, FC 142 a 160",km:8}]},
+
+ {n:4,f:"28 de septiembre al 4 de octubre",b:"Específico",bk:"esp",km:29,
+  nota:"Las series van a ritmo umbral, 4'20\", más rápido que el ritmo objetivo de carrera. Entrenar por sobre el ritmo de competencia es lo que hace que 4'27\" se perciba sostenible el día de la carrera.",d:[
+  {i:"s4a",f:"Lun 28",fe:"2026-09-28",t:"descanso",ti:"Descanso absoluto"},
+  {i:"s4b",f:"Mar 29",fe:"2026-09-29",t:"rodaje",ti:"Rodaje suave más 4 strides",de:"6 km, FC 142 a 160",km:6},
+  {i:"s4c",f:"Mié 30",fe:"2026-09-30",t:"fuerza",ti:"Fuerza, Rutina B",de:"3 series. Entra carga externa"},
+  {i:"s4d",f:"Jue 1",fe:"2026-10-01",t:"calidad",ti:"4 x 1000 m a ritmo umbral",de:"4'18\" a 4'22\"/km, 2 min estáticos. El intervalo largo obliga a sostener el umbral. Total 8,5 km",km:8.5},
+  {i:"s4e",f:"Vie 2",fe:"2026-10-02",t:"fuerza",ti:"Fuerza, Rutina B",de:"3 series"},
+  {i:"s4f",f:"Sáb 3",fe:"2026-10-03",t:"rodaje",ti:"Rodaje moderado",de:"5 km, FC 161 a 169",km:5},
+  {i:"s4g",f:"Dom 4",fe:"2026-10-04",t:"largo",ti:"Rodaje largo",de:"9,5 km, FC 142 a 160",km:9.5}]},
+
+ {n:5,f:"5 al 11 de octubre",b:"Específico",bk:"esp",km:32,d:[
+  {i:"s5a",f:"Lun 5",fe:"2026-10-05",t:"descanso",ti:"Descanso absoluto"},
+  {i:"s5b",f:"Mar 6",fe:"2026-10-06",t:"rodaje",ti:"Rodaje suave más 4 strides",de:"6,5 km, FC 142 a 160",km:6.5},
+  {i:"s5c",f:"Mié 7",fe:"2026-10-07",t:"fuerza",ti:"Fuerza, Rutina B",de:"3 series"},
+  {i:"s5d",f:"Jue 8",fe:"2026-10-08",t:"calidad",ti:"5 x 1000 m a ritmo umbral",de:"4'18\" a 4'22\"/km, 2 min estáticos. Máxima densidad de umbral del bloque, 5 km efectivos. Total 10 km",km:10},
+  {i:"s5e",f:"Vie 9",fe:"2026-10-09",t:"fuerza",ti:"Fuerza, Rutina B",de:"3 series"},
+  {i:"s5f",f:"Sáb 10",fe:"2026-10-10",t:"rodaje",ti:"Rodaje moderado",de:"5,5 km, FC 161 a 169",km:5.5},
+  {i:"s5g",f:"Dom 11",fe:"2026-10-11",t:"largo",ti:"Rodaje largo",de:"10 km, FC 142 a 160. Techo del bloque Específico",km:10}]},
+
+ {n:6,f:"12 al 18 de octubre",b:"Descarga y control",bk:"descarga",km:23,
+  nota:"El control se ejecuta en semana de descarga, igual que el de julio, para que sea comparable. Referencia previa: 21:57 el 5 de julio. Se corre a fondo y con la Adizero EVO SL EXO.",d:[
+  {i:"s6a",f:"Lun 12",fe:"2026-10-12",t:"descanso",ti:"Descanso absoluto"},
+  {i:"s6b",f:"Mar 13",fe:"2026-10-13",t:"rodaje",ti:"Rodaje suave más 4 strides",de:"4,5 km, FC 142 a 160",km:4.5},
+  {i:"s6c",f:"Mié 14",fe:"2026-10-14",t:"fuerza",ti:"Fuerza, Rutina B reducida",de:"2 series, sin pliometría. No debe quedar fatiga residual"},
+  {i:"s6d",f:"Jue 15",fe:"2026-10-15",t:"rodaje",ti:"Rodaje suave",de:"4 km. Sin calidad esta semana, el control cumple ese rol",km:4},
+  {i:"s6e",f:"Vie 16",fe:"2026-10-16",t:"descanso",ti:"Descanso, día previo al control"},
+  {i:"s6f",f:"Sáb 17",fe:"2026-10-17",t:"calidad",ti:"Control 5K a fondo, en pista",de:"Recalibra los ritmos del bloque Pico. Total 8,5 km con calentamiento y enfriamiento",km:8.5},
+  {i:"s6g",f:"Dom 18",fe:"2026-10-18",t:"largo",ti:"Rodaje largo suave",de:"6 km, regeneración post control",km:6}]},
+
+ {n:7,f:"19 al 25 de octubre",b:"Pico",bk:"pico",km:35,d:[
+  {i:"s7a",f:"Lun 19",fe:"2026-10-19",t:"descanso",ti:"Descanso absoluto"},
+  {i:"s7b",f:"Mar 20",fe:"2026-10-20",t:"rodaje",ti:"Rodaje suave más 4 strides",de:"7 km, FC 142 a 160",km:7},
+  {i:"s7c",f:"Mié 21",fe:"2026-10-21",t:"fuerza",ti:"Fuerza, Rutina C",de:"3 series. Entra pliometría de mayor intensidad"},
+  {i:"s7d",f:"Jue 22",fe:"2026-10-22",t:"calidad",ti:"3 x 2000 m a ritmo de carrera",de:"4'25\" a 4'28\"/km, 2 min 30 s estáticos. Primer ensayo del ritmo real, 6 km a objetivo. Total 11 km",km:11},
+  {i:"s7e",f:"Vie 23",fe:"2026-10-23",t:"fuerza",ti:"Fuerza, Rutina C",de:"3 series"},
+  {i:"s7f",f:"Sáb 24",fe:"2026-10-24",t:"rodaje",ti:"Rodaje moderado",de:"6 km, FC 161 a 169",km:6},
+  {i:"s7g",f:"Dom 25",fe:"2026-10-25",t:"largo",ti:"Rodaje largo",de:"11 km. No debe correrse rápido",km:11}]},
+
+ {n:8,f:"26 de octubre al 1 de noviembre",b:"Pico",bk:"pico",km:38.5,
+  nota:"Semana pico. Se ejecuta una sola vez y no se repite. Ante bursitis, molestia de banda iliotibial o aprietes en la rodilla operada, el volumen se recorta a 33 o 34 km sin discusión.",d:[
+  {i:"s8a",f:"Lun 26",fe:"2026-10-26",t:"descanso",ti:"Descanso absoluto"},
+  {i:"s8b",f:"Mar 27",fe:"2026-10-27",t:"rodaje",ti:"Rodaje suave más 4 strides",de:"7,5 km, FC 142 a 160",km:7.5},
+  {i:"s8c",f:"Mié 28",fe:"2026-10-28",t:"fuerza",ti:"Fuerza, Rutina C",de:"3 series. Última semana de fuerza pesada del ciclo"},
+  {i:"s8d",f:"Jue 29",fe:"2026-10-29",t:"calidad",ti:"2 x 3000 m a ritmo de carrera",de:"4'25\" a 4'28\"/km, 3 min estáticos. Sesión más específica del ciclo, reemplaza a la simulación de 10K. Total 11 km",km:11},
+  {i:"s8e",f:"Vie 30",fe:"2026-10-30",t:"fuerza",ti:"Fuerza, Rutina C",de:"3 series"},
+  {i:"s8f",f:"Sáb 31",fe:"2026-10-31",t:"rodaje",ti:"Rodaje moderado",de:"8 km, FC 161 a 169",km:8},
+  {i:"s8g",f:"Dom 1",fe:"2026-11-01",t:"largo",ti:"Rodaje largo",de:"12 km. Largo máximo del ciclo, desde aquí todo baja",km:12}]},
+
+ {n:9,f:"2 al 8 de noviembre",b:"Taper",bk:"taper",km:27,
+  nota:"Menos volumen de serie, ritmo intacto. La intensidad no baja en el taper.",d:[
+  {i:"s9a",f:"Lun 2",fe:"2026-11-02",t:"descanso",ti:"Descanso absoluto"},
+  {i:"s9b",f:"Mar 3",fe:"2026-11-03",t:"rodaje",ti:"Rodaje suave más 4 strides",de:"6 km. Los strides se conservan durante todo el taper",km:6},
+  {i:"s9c",f:"Mié 4",fe:"2026-11-04",t:"fuerza",ti:"Fuerza, Rutina A",de:"2 series, sin skipping. Mantiene el patrón motor sin fatiga residual"},
+  {i:"s9d",f:"Jue 5",fe:"2026-11-05",t:"calidad",ti:"4 x 1000 m a ritmo de carrera",de:"4'25\" a 4'28\"/km, 2 min estáticos. Total 8,5 km",km:8.5},
+  {i:"s9e",f:"Vie 6",fe:"2026-11-06",t:"descanso",ti:"Sin sesión de fuerza"},
+  {i:"s9f",f:"Sáb 7",fe:"2026-11-07",t:"rodaje",ti:"Rodaje moderado",de:"4,5 km, FC 161 a 169",km:4.5},
+  {i:"s9g",f:"Dom 8",fe:"2026-11-08",t:"largo",ti:"Rodaje largo",de:"8 km. Último largo, reducido un tercio respecto del pico",km:8}]},
+
+ {n:10,f:"9 al 15 de noviembre",b:"Carrera",bk:"carrera",km:25,d:[
+  {i:"s10a",f:"Lun 9",fe:"2026-11-09",t:"descanso",ti:"Descanso absoluto"},
+  {i:"s10b",f:"Mar 10",fe:"2026-11-10",t:"rodaje",ti:"Rodaje suave más 4 strides",de:"6 km. Mantiene la mecánica sin generar carga",km:6},
+  {i:"s10c",f:"Mié 11",fe:"2026-11-11",t:"fuerza",ti:"Movilidad y foam roller, sin fuerza",de:"La semana de carrera prioriza frescura muscular"},
+  {i:"s10d",f:"Jue 12",fe:"2026-11-12",t:"calidad",ti:"Activación, 3 x 600 m a ritmo de carrera",de:"2 min 30 s estáticos. Recuerda el ritmo a las piernas sin costo. Total 5,5 km",km:5.5},
+  {i:"s10e",f:"Vie 13",fe:"2026-11-13",t:"descanso",ti:"Descanso absoluto"},
+  {i:"s10f",f:"Sáb 14",fe:"2026-11-14",t:"rodaje",ti:"Trote muy suave más 3 strides",de:"3,5 km. Evita la sensación de piernas dormidas",km:3.5},
+  {i:"s10g",f:"Dom 15",fe:"2026-11-15",t:"carrera",ti:"Carrera 10K oficial",de:"Objetivo 44:20 a 44:45. Km 1-2 a 4'30\", km 3-7 a 4'26\"-4'28\", km 8-10 a 4'20\" o lo que permita",km:10}]}
+];
+
+const CLAVE = "plan10k-progreso";
+let estado = {};
+let listo = false;
+
+/* Almacenamiento con dos vías: usa la del visor de Claude si existe,
+   y si no, la del propio navegador. Así el archivo funciona igual
+   abierto desde el visor o descargado y abierto en cualquier navegador. */
+var almacen = {
+  disponible: true,
+  leer: function(){
+    if (window.storage && typeof window.storage.get === "function"){
+      return window.storage.get(CLAVE)
+        .then(function(r){ return r && r.value ? r.value : null; })
+        .catch(function(){ return null; });
+    }
+    try { return Promise.resolve(window.localStorage.getItem(CLAVE)); }
+    catch(e){ almacen.disponible = false; return Promise.resolve(null); }
+  },
+  escribir: function(v){
+    if (window.storage && typeof window.storage.set === "function"){
+      return window.storage.set(CLAVE, v)
+        .then(function(){ return true; })
+        .catch(function(){ return false; });
+    }
+    try { window.localStorage.setItem(CLAVE, v); return Promise.resolve(true); }
+    catch(e){ almacen.disponible = false; return Promise.resolve(false); }
+  }
+};
+
+const $ = s => document.querySelector(s);
+const esMarcable = d => d.t !== "descanso";
+const hoyISO = () => { const n = new Date(); return n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0"); };
+
+async function cargar(){
+  const crudo = await almacen.leer();
+  try{ estado = crudo ? JSON.parse(crudo) : {}; }
+  catch(e){ estado = {}; }
+  listo = true;
+  $("#estado").textContent = almacen.disponible
+    ? ""
+    : "Este navegador está bloqueando el guardado, probablemente por estar en modo privado. Las marcas no se conservarán al cerrar.";
+  pintar();
+}
+async function guardar(){
+  const ok = await almacen.escribir(JSON.stringify(estado));
+  $("#estado").textContent = ok ? "" : "No se pudo guardar la marca. Usa Guardar copia para no perder el avance.";
+}
+async function alternar(id){
+  if(!listo) return;
+  estado[id] = !estado[id];
+  pintar();
+  await guardar();
+}
+
+function ubicar(){
+  const h = hoyISO();
+  for(const s of PLAN) for(const d of s.d) if(d.fe === h) return {s,d};
+  return null;
+}
+
+function pintarHoy(){
+  const u = ubicar();
+  const box = $("#hoyBox");
+  const h = hoyISO();
+  if(!u){
+    const antes = h < PLAN[0].d[0].fe;
+    const p = PLAN[0].d[1];
+    box.innerHTML = antes
+      ? `<div class="hoy"><p class="hoy-meta">El ciclo parte el lunes 7 de septiembre</p><p class="hoy-tit">Primera sesión, martes 8</p><p class="hoy-det">${p.ti}. ${p.de}</p></div>`
+      : `<div class="hoy"><p class="hoy-meta">Fuera del ciclo</p><p class="hoy-tit">Ciclo cerrado</p><p class="hoy-det">Las diez semanas del plan ya concluyeron.</p></div>`;
+    return;
+  }
+  const {s,d} = u;
+  const hecho = !!estado[d.i];
+  const cls = d.t === "carrera" ? "esCarrera" : (d.t === "calidad" ? "esCalidad" : "");
+  const acc = !esMarcable(d)
+    ? ""
+    : `<button class="btn ${hecho?"done":""}" id="btnHoy">${hecho ? "Sesión completada" : "Marcar como hecha"}</button>`;
+  box.innerHTML = `<div class="hoy ${cls}">
+      <p class="hoy-meta">Hoy, ${d.f}. Semana ${s.n}, ${s.b}</p>
+      <p class="hoy-tit">${d.ti}</p>
+      ${d.de?`<p class="hoy-det">${d.de}</p>`:`<p class="hoy-det">Sin carga. El descanso del lunes no se negocia.</p>`}
+      ${acc}
+    </div>`;
+  const b = $("#btnHoy");
+  if(b) b.onclick = () => alternar(d.i);
+}
+
+function progSemana(s){
+  const tot = s.d.filter(esMarcable).length;
+  const hechas = s.d.filter(d => esMarcable(d) && estado[d.i]).length;
+  return {tot,hechas};
+}
+
+function pintarBarras(){
+  const max = 38.5, h = hoyISO();
+  const cont = $("#bars"), nums = $("#barNums");
+  cont.innerHTML = ""; nums.innerHTML = "";
+  let kmTot = 0, kmHecho = 0;
+  PLAN.forEach(s => {
+    const {tot,hechas} = progSemana(s);
+    const pct = tot ? hechas/tot : 0;
+    const alt = Math.max(9, Math.round((s.km/max)*74));
+    const activa = s.d.some(d => d.fe === h);
+    kmTot += s.km; kmHecho += s.km*pct;
+    const b = document.createElement("button");
+    b.className = "bar" + (activa?" actual":"");
+    b.dataset.b = s.bk;
+    b.setAttribute("aria-label", `Semana ${s.n}, ${s.km} km, ${hechas} de ${tot} sesiones`);
+    b.innerHTML = `<div class="fill" style="height:${alt}px"></div><div class="prog" style="height:${Math.round(alt*pct)}px"></div>`;
+    b.onclick = () => {
+      const el = document.getElementById("wk"+s.n);
+      document.querySelectorAll(".wk").forEach(w => w.classList.remove("on"));
+      el.classList.add("on");
+      el.scrollIntoView({behavior:"smooth",block:"start"});
+    };
+    cont.appendChild(b);
+    const n = document.createElement("div");
+    n.className = "bar-n"; n.style.flex = "1"; n.textContent = s.n;
+    nums.appendChild(n);
+  });
+  $("#totalProg").textContent = `${Math.round(kmHecho)} de ${kmTot} km`;
+}
+
+function pintarSemanas(){
+  const h = hoyISO();
+  const cont = $("#semanas");
+  const abiertas = new Set([...document.querySelectorAll(".wk.on")].map(e => e.id));
+  cont.innerHTML = "";
+  PLAN.forEach(s => {
+    const {tot,hechas} = progSemana(s);
+    const activa = s.d.some(d => d.fe === h);
+    const wk = document.createElement("section");
+    wk.className = "wk" + ((abiertas.size ? abiertas.has("wk"+s.n) : activa) ? " on" : "");
+    wk.id = "wk"+s.n;
+    const filas = s.d.map(d => {
+      const marc = esMarcable(d), hecho = !!estado[d.i];
+      const pill = d.t==="calidad" ? `<span class="pill p-cal">calidad</span>`
+                 : d.t==="fuerza" ? `<span class="pill p-fue">fuerza</span>`
+                 : d.t==="carrera" ? `<span class="pill p-car">carrera</span>` : "";
+      return `<button class="dia ${marc?"":"rest"} ${hecho?"hecho":""} ${d.fe===h?"hoyRow":""}" data-id="${d.i}" ${marc?"":"disabled"}>
+        <span class="mark">${hecho?"&#10003;":""}</span>
+        <span class="d-fecha">${d.f}</span>
+        <span class="d-body"><span class="d-t">${d.ti}${pill}</span> ${d.de?`<span class="d-d">${d.de}</span>`:""}</span>
+      </button>`;
+    }).join("");
+    wk.innerHTML = `
+      <button class="wk-head" aria-expanded="false">
+        <span class="wk-num">${s.n}</span>
+        <span class="wk-info"><span class="wk-t">${s.b}, ${s.km} km</span> <span class="wk-s">${s.f}</span></span>
+        <span class="wk-prog ${hechas===tot?"full":""}">${hechas}/${tot}</span>
+        <span class="chev">&#9660;</span>
+      </button>
+      <div class="wk-body">${filas}${s.nota?`<p class="nota">${s.nota}</p>`:""}</div>`;
+    wk.querySelector(".wk-head").onclick = () => {
+      wk.classList.toggle("on");
+      wk.querySelector(".wk-head").setAttribute("aria-expanded", wk.classList.contains("on"));
+    };
+    wk.querySelectorAll(".dia[data-id]").forEach(el => {
+      if(el.disabled) return;
+      el.onclick = () => alternar(el.dataset.id);
+    });
+    cont.appendChild(wk);
+  });
+}
+
+function pintarCuenta(){
+  const meta = new Date("2026-11-15T09:00:00");
+  const dias = Math.ceil((meta - new Date())/86400000);
+  const u = ubicar();
+  $("#kicker").textContent = u ? `Semana ${u.s.n} de 10, bloque ${u.s.b}` : "Plan de diez semanas";
+  $("#countdown").innerHTML = dias > 0
+    ? `Faltan <b>${dias} días</b>. Objetivo, consolidar un sub 45 real en carrera.`
+    : `Objetivo, consolidar un sub 45 real en carrera.`;
+}
+
+function pintar(){ pintarCuenta(); pintarHoy(); pintarBarras(); pintarSemanas(); }
+
+document.querySelectorAll(".tab").forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll(".tab").forEach(x => x.classList.remove("on"));
+    document.querySelectorAll(".panel").forEach(x => x.classList.remove("on"));
+    t.classList.add("on");
+    document.getElementById("p-"+t.dataset.p).classList.add("on");
+  };
+});
+
+$("#exportar").onclick = function(){
+  var datos = JSON.stringify({plan:"10K FEDACHI 15.11", guardado:new Date().toISOString(), marcas:estado}, null, 2);
+  var url = URL.createObjectURL(new Blob([datos], {type:"application/json"}));
+  var a = document.createElement("a");
+  a.href = url; a.download = "plan10k-marcas.json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+};
+
+$("#restaurar").onclick = function(){ $("#archivoCopia").click(); };
+
+$("#archivoCopia").onchange = function(ev){
+  var f = ev.target.files && ev.target.files[0];
+  if(!f) return;
+  var lector = new FileReader();
+  lector.onload = async function(){
+    try{
+      var d = JSON.parse(lector.result);
+      var marcas = d && d.marcas ? d.marcas : d;
+      if(typeof marcas !== "object" || marcas === null) throw new Error();
+      estado = marcas;
+      pintar(); await guardar();
+      $("#estado").textContent = "Copia restaurada.";
+      setTimeout(function(){ if($("#estado").textContent === "Copia restaurada.") $("#estado").textContent = ""; }, 3000);
+    }catch(e){
+      $("#estado").textContent = "Ese archivo no es una copia válida. Debe ser el archivo plan10k-marcas.json.";
+    }
+    ev.target.value = "";
+  };
+  lector.readAsText(f);
+};
+
+$("#reset").onclick = async () => {
+  const b = $("#reset");
+  if(b.dataset.confirmar !== "1"){
+    b.dataset.confirmar = "1";
+    b.textContent = "Confirmar borrado";
+    setTimeout(() => { b.dataset.confirmar = "0"; b.textContent = "Borrar marcas"; }, 4000);
+    return;
+  }
+  estado = {};
+  b.dataset.confirmar = "0"; b.textContent = "Borrar marcas";
+  pintar(); await guardar();
+};
+
+/* Instalación en la pantalla de inicio y funcionamiento sin conexión.
+   Solo aplica cuando la página está publicada en https. */
+if ("serviceWorker" in navigator && location.protocol === "https:"){
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("./sw.js").catch(function(){});
+  });
+}
+
+var promptInstalar = null;
+window.addEventListener("beforeinstallprompt", function(e){
+  e.preventDefault();
+  promptInstalar = e;
+  var b = $("#instalar");
+  if(b) b.hidden = false;
+});
+$("#instalar").onclick = async function(){
+  if(!promptInstalar) return;
+  promptInstalar.prompt();
+  await promptInstalar.userChoice;
+  promptInstalar = null;
+  $("#instalar").hidden = true;
+};
+window.addEventListener("appinstalled", function(){
+  promptInstalar = null;
+  var b = $("#instalar");
+  if(b) b.hidden = true;
+});
+
+$("#estado").textContent = "Cargando marcas guardadas";
+pintar();
+cargar();
+</script>
+</body>
+</html>

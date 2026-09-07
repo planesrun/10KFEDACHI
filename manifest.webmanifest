@@ -1,0 +1,17 @@
+{
+  "name": "10K FEDACHI - 15.11",
+  "short_name": "10K FEDACHI",
+  "description": "Plan de entrenamiento de diez semanas hacia el 10K del 15 de noviembre de 2026.",
+  "lang": "es-CL",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#E9EAE4",
+  "theme_color": "#14212C",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
