@@ -2,7 +2,7 @@
    Guarda una copia local de la app para que abra sin conexión.
    Al publicar una versión nueva del plan, sube el número de VERSION. */
 
-const VERSION = "plan10k-v1";
+const VERSION = "plan10k-v2";
 const ARCHIVOS = [
   "./",
   "./index.html",
